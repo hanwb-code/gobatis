@@ -1,0 +1,10 @@
+db:
+  - datasource: ds
+    driverName: mysql
+    dataSourceName: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
+    maxLifeTime: 120
+    maxOpenConns: 10
+    maxIdleConns: 5
+showSQL: true
+mappers:
+  - examples/mapper/userMapper.xml

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwb-code/gobatis"    // 引入gobatis
+	"github.com/hanwbcode/gobatis"     // 引入gobatis
 )
 
 // 实体结构示例， tag：field为数据库对应字段名称

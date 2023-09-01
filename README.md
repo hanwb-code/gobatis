@@ -1,6 +1,6 @@
 # gobatis
 
-[![CodeQL](https://github.com/hanwb-code/gobatis/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/hanwb-code/gobatis/actions/workflows/codeql.yml)
+[![CodeQL](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml)
 
 目前代码都是基于类mysql数据库编写测试的,其他数据库暂时还未做兼容处理
 
@@ -192,7 +192,7 @@ package main
 import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwb-code/gobatis"        // 引入gobatis
+	"github.com/hanwbcode/gobatis"        // 引入gobatis
 )
 
 // 实体结构示例， tag：field为数据库对应字段名称
@@ -294,7 +294,7 @@ package main
 import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwb-code/gobatis"        // 引入gobatis
+	"github.com/hanwbcode/gobatis"        // 引入gobatis
 )
 
 // 实体结构示例， tag：field为数据库对应字段名称
@@ -344,7 +344,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwb-code/gobatis"        // 引入gobatis
+	"github.com/hanwbcode/gobatis"        // 引入gobatis
 )
 
 // 实体结构示例， tag：field为数据库对应字段名称

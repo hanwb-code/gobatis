@@ -1,10 +1,9 @@
 package gobatis
 
 import (
+	"gopkg.in/yaml.v3"
 	"io"
 	"strings"
-
-	"gopkg.in/yaml.v2"
 )
 
 func buildMapperConfig(r io.Reader) *mapperConfig {

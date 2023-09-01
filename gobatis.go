@@ -67,10 +67,10 @@ func Get(datasource string) *DB {
 		panic(errors.New("Datasource:" + datasource + " not exists!"))
 	}
 
-	dbType := ds.dbType
-	if dbType != DBTypeMySQL {
-		panic(errors.New("No support to this driver name!"))
-	}
+	//dbType := ds.dbType
+	//if dbType != DBTypeMySQL {
+	//	panic(errors.New("No support to this driver name!"))
+	//}
 
 	gb := &DB{
 		gbBase{
@@ -130,7 +130,8 @@ var _ GoBatis = &TX{}
 // Begin TX
 //
 // ps：
-//  TX, err := this.Begin()
+//
+//	TX, err := this.Begin()
 func (d *DB) Begin() (*TX, error) {
 	if nil == d.db {
 		return nil, errors.New("db no opened")
@@ -159,7 +160,8 @@ func (d *DB) Begin() (*TX, error) {
 // Begin TX with ctx & opts
 //
 // ps：
-//  TX, err := this.BeginTx(ctx, ops)
+//
+//	TX, err := this.BeginTx(ctx, ops)
 func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*TX, error) {
 	if nil == d.db {
 		return nil, errors.New("db no opened")
@@ -248,7 +250,8 @@ func (d *DB) TransactionTX(ctx context.Context, opts *sql.TxOptions, fn func(tx 
 // Close db
 //
 // ps：
-//  err := this.Close()
+//
+//	err := this.Close()
 func (g *gbBase) Close() error {
 	if nil == g.db {
 		return errors.New("db no opened")
@@ -267,7 +270,8 @@ func (g *gbBase) Close() error {
 // Commit TX
 //
 // ps：
-//  err := TX.Commit()
+//
+//	err := TX.Commit()
 func (t *TX) Commit() error {
 	if nil == t.db {
 		return errors.New("TX no running")
@@ -285,7 +289,8 @@ func (t *TX) Commit() error {
 // Rollback TX
 //
 // ps：
-//  err := TX.Rollback()
+//
+//	err := TX.Rollback()
 func (t *TX) Rollback() error {
 	if nil == t.db {
 		return errors.New("TX no running")

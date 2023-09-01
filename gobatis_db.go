@@ -5,8 +5,9 @@ import "database/sql"
 type DBType string
 
 const (
-	DBTypeMySQL    DBType = "mysql"
-	DBTypePostgres DBType = "postgres"
+	DBTypeMySQL      DBType = "mysql"
+	DBTypePostgres   DBType = "postgres"
+	DBTypeClickhouse DBType = "clickhouse"
 )
 
 type GoBatisDB struct {

@@ -7,7 +7,7 @@ import (
 )
 
 func buildMapperConfig(r io.Reader) *mapperConfig {
-	rootNode := parse(r)
+	rootNode := Parse(r)
 
 	conf := &mapperConfig{
 		mappedStmts: make(map[string]*node),

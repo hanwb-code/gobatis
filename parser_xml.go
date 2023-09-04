@@ -36,7 +36,7 @@ type element struct {
 	Val         interface{}
 }
 
-func parse(r io.Reader) *node {
+func Parse(r io.Reader) *node {
 	parser := xml.NewDecoder(r)
 	var root node
 	namespace := ""

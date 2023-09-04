@@ -1,385 +1,48 @@
-# gobatis
+# Gobatis
 
-[![CodeQL](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml)
+适用于 Golang，基于 MyBatis 标签语法的持久层框架。
 
-目前代码都是基于类mysql数据库编写测试的,其他数据库暂时还未做兼容处理
+## 特性
 
-- [x] 支持数据库
-  - [x] mysql
-  - [x] tidb
-  - [x] mariadb
-  - [ ] postgres
-  - [ ] sqlite
-- [x] 基础操作
-  - [x] query
-  - [x] insert
-  - [x] update
-  - [x] delete
+- 基于 database/sql 实现与数据库无关；
+- 适用 golang 语法，支持多参数传递和多参数返回；
+- 支持 xml 文件打包成 bin 文件；
+- 支持 mybatis 的标签语法；
 
-## ToDo
+## TODO
 
-- 增加更多易用表达式指令，目前已有`$blank`指令用于判别字符串是否为空的指令，比如判断name为空串： test="$blank(name)"
+- 持续性测试；
+- 优化错误返回信息，增加上下文提示；
 
-## 模板代码生成
+## 支持扫描数据类型
 
-提供了简单的增删改查代码自动生成
+- int,int8,int16,int32,int64
+- uint,uint8,uint16,uint32,uint64
+- float32,float64
+- time.Time
+- decimal.Decimal
 
-具体操作看仓库： [https://github.com/wenj91/mctl.git](https://github.com/wenj91/mctl.git)
+## 支持顶级 SQL 标签
 
-## gobatis接口
+- insert
+- select
+- update
+- delete
 
-```go
-type GoBatis interface {
-	// Select 查询数据
-	Select(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error)
-	// SelectContext 查询数据with context
-	SelectContext(ctx context.Context, stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error)
-	// Insert 插入数据
-	Insert(stmt string, param interface{}) (lastInsertId int64, affected int64, err error)
-	// InsertContext 插入数据with context
-	InsertContext(ctx context.Context, stmt string, param interface{}) (lastInsertId int64, affected int64, err error)
-	// Update 更新数据
-	Update(stmt string, param interface{}) (affected int64, err error)
-	// UpdateContext 更新数据with context
-	UpdateContext(ctx context.Context, stmt string, param interface{}) (affected int64, err error)
-	// Delete 刪除数据
-	Delete(stmt string, param interface{}) (affected int64, err error)
-	// DeleteContext 刪除数据with context
-	DeleteContext(ctx context.Context, stmt string, param interface{}) (affected int64, err error)
-}
+## 支持动态 SQL 标签
+
+- if
+- choose、when、otherwise
+- trim、where、set
+- foreach
+
+## 安装
+
+```
+$ go get -v github.com/gobatis/gobatis
 ```
 
-## db数据源配置
-- 支持多数据源配置
-- db子级配置为一个map，map的key即为数据源名称标识  
-- map的value为数据源具体配置，具体配置项如下表
+## 初始化
 
-| 配置 | 是否必填配置 | 默认值 | 说明 |
-|:---|:----:|:----:|----|
-| driverName | 是 | | 数据源驱动名，必填配置项
-| dataSourceName | 是 | | 数据源名称，必填配置项，例如: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-| maxLifeTime | 否 | 120(单位: s)| 连接最大存活时间，默认值为: 120 单位为: s
-| maxOpenConns | 否 | 10 | 最大打开连接数，默认值为: 10
-| maxIdleConns | 否 | 5 | 最大挂起连接数，默认值为: 5
+参考 engine_test.go -> TestEngine。
 
-### 示例
-* db配置示例(配置较之前的有所调整)  
-以下为多数据源配置示例: db.yml
-```yaml
-# 数据库配置
-db:
-  # 数据源名称1
-  - datasource: ds1
-    # 驱动名
-    driverName: mysql
-    # 数据源
-    dataSourceName: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-    # 连接最大存活时间（单位: s）
-    maxLifeTime: 120
-    # 最大open连接数
-    maxOpenConns: 10
-    # 最大挂起连接数
-    maxIdleConns: 5
-  # 数据源名称2
-  - datasource: ds2
-    # 驱动名
-    driverName: mysql
-    # 数据源
-    dataSourceName: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-    # 连接最大存活时间（单位: s）
-    maxLifeTime: 120
-    # 最大open连接数
-    maxOpenConns: 10
-    # 最大挂起连接数
-    maxIdleConns: 5
-# 是否显示SQL语句
-showSql: true
-# 数据表映射文件路径配置
-mappers:
-  # 映射文件路径， 可以为绝对路径，如: /usr/local/mapper/userMapper.xml
-  - mapper/userMapper.xml
-```
-
-* mapper配置  
-1. mapper可以配置namespace属性  
-1. mapper可以包含: select, insert, update, delete标签  
-1. mapper子标签id属性则为标签唯一标识, 必须配置属性
-1. 其中select标签必须包含resultType属性，resultType可以是: map, maps, array, arrays, struct, structs, value
-  
-* 标签说明  
-select: 用于查询操作   
-insert: 用于插入sql操作  
-update: 用于更新sql操作  
-delete: 用于删除sql操作
-
-* resultType说明  
-map: 则数据库查询结果为map  
-maps: 则数据库查询结果为map数组  
-array: 则数据库查询结果为值数组  
-arrays: 则数据库查询结果为多个值数组  
-struct: 则数据库查询结果为单个结构体  
-structs: 则数据库查询结果为结构体数组  
-value: 则数据库查询结果为单个数值  
- 
-以下是mapper配置示例: mapper/userMapper.xml
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "gobatis"
-        "https://raw.githubusercontent.com/wenj91/gobatis/master/gobatis.dtd">
-<mapper namespace="userMapper">
-    <sql id="Base_Column_List">
-        id, name, crtTm, pwd, email
-    </sql>
-    <select id="findIncludeMaps" resultType="maps">
-        SELECT
-        	<include refid="Base_Column_List" />
-        FROM user
-        limit 10
-    </select>
-    <select id="findMapById" resultType="map">
-        SELECT id, name FROM user where id=#{id} order by id
-    </select>
-    <select id="findMapByValue" resultType="map">
-            SELECT id, name FROM user where id=#{0} order by id
-    </select>
-    <select id="findStructByStruct" resultType="struct">
-        SELECT id, name, crtTm FROM user where id=#{Id} order by id
-    </select>
-    <select id="queryStructs" resultType="structs">
-        SELECT id, name, crtTm FROM user order by id
-    </select>
-    <select id="queryStructsByOrder" resultType="structs">
-        SELECT id, name, crtTm FROM user order by ${id} desc
-    </select>
-    <insert id="insertStruct">
-        insert into user (name, email, crtTm)
-        values (#{Name}, #{Email}, #{CrtTm})
-    </insert>
-    <delete id="deleteById">
-        delete from user where id=#{id}
-    </delete>
-    <select id="queryStructsByCond" resultType="structs">
-         SELECT id, name, crtTm, pwd, email FROM user
-         <where>
-             <if test="!$blank(Name)">and name = #{Name}</if>
-         </where>
-         order by id
-    </select>
-     <select id="queryStructsByCond2" resultType="structs">
-         SELECT id, name, crtTm, pwd, email FROM user
-         <trim prefixOverrides="and" prefix="where" suffixOverrides="," suffix="and 1=1">
-              <if test="!$blank(Name)">and name = #{Name}</if>
-         </trim>
-         order by id
-    </select>
-    <update id="updateByCond">
-        update user
-        <set>
-            <if test="!$blank(Name) and !$blank(Name2)">name = #{Name},</if>
-        </set>
-        where id = #{Id}
-    </update>
-</mapper>
-```
-
-## 使用方法
-
-###  使用配置文件配置
-example1.go
-```go
-package main
-
-import (
-	"fmt"
-	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwbcode/gobatis"        // 引入gobatis
-)
-
-// 实体结构示例， tag：field为数据库对应字段名称
-type User struct {
-	Id    gobatis.NullInt64  `field:"id"`
-	Name  gobatis.NullString `field:"name"`
-	Email gobatis.NullString `field:"email"`
-	CrtTm gobatis.NullTime   `field:"crtTm"`
-}
-
-
-// User to string
-func (u *User) String() string {
-	bs, _ := json.Marshal(u)
-	return string(bs)
-}
-
-func main() {
-	// 初始化db，参数为db.yml路径，如：db.yml	
-	gobatis.Init(gobatis.NewFileOption("db.yml"))
-
-	// 获取数据源，参数为数据源名称，如：datasource1
-	gb := gobatis.Get("ds1")
-
-	//传入id查询Map
-	mapRes := make(map[string]interface{})
-	// stmt标识为：namespace + '.' + id, 如：userMapper.findMapById
-	// 查询参数可以是map，也可以是数组，也可以是实体结构
-	_, err := gb.Select("userMapper.findMapById", map[string]interface{}{"id": 1})(mapRes)
-	fmt.Println("userMapper.findMapById-->", mapRes, err)
-
-	// 根据传入实体查询对象
-	param := User{Id: gobatis.NullInt64{Int64: 1, Valid: true}}
-	var structRes *User
-	_, err = gb.Select("userMapper.findStructByStruct", param)(&structRes)
-	fmt.Println("userMapper.findStructByStruct-->", structRes, err)
-
-	// 查询实体列表
-	structsRes := make([]*User, 0)
-	_, err = gb.Select("userMapper.queryStructs", map[string]interface{}{})(&structsRes)
-	fmt.Println("userMapper.queryStructs-->", structsRes, err)
-
-	param = User{
-		Id:   gobatis.NullInt64{Int64: 1, Valid: true},
-		Name: gobatis.NullString{String: "wenj1993", Valid: true},
-	}
-
-	// set tag
-	affected, err := gb.Update("userMapper.updateByCond", param)
-	fmt.Println("updateByCond:", affected, err)
-
-	param = User{Name: gobatis.NullString{String: "wenj1993", Valid: true}}
-	// where tag
-	res := make([]*User, 0)
-	_, err = gb.Select("userMapper.queryStructsByCond", param)(&res)
-	fmt.Println("queryStructsByCond", res, err)
-
-	// trim tag
-	res = make([]*User, 0)
-	_, err = gb.Select("userMapper.queryStructsByCond2", param)(&res)
-	fmt.Println("queryStructsByCond2", res, err)
-
-	// include tag
-	ms := make([]map[string]interface{}, 0)
-	_, err = gb.Select("userMapper.findIncludeMaps", nil)(&ms)
-	fmt.Println("userMapper.findIncludeMaps-->", ms, err)
-	
-	// ${id}
-	res = make([]*User, 0)
-	_, err = gb.Select("userMapper.queryStructsByOrder", map[string]interface{}{
-		"id":"id",
-	})(&res)
-	fmt.Println("queryStructsByCond", res, err)
-
-	// ${id} with count, 传入RowBounds(0, 100)即可返回count总数
-	res = make([]*User, 0)
-	cnt, err = gb.Select("userMapper.queryStructsByOrder", map[string]interface{}{
-		"id":"id",
-	}, RowBounds(0, 100))(&res)
-	fmt.Println("queryStructsByCond", cnt, res, err)
-
-
-	// 开启事务示例
-	tx, _ := gb.Begin()
-	defer tx.Rollback()
-	_, tx.Select("userMapper.findMapById", map[string]interface{}{"id": 1,})(mapRes)
-	fmt.Println("tx userMapper.findMapById-->", mapRes, err)
-	tx.Commit()
-}
-```
-
-### 代码配置方式
-
-example2.go
-
-```go
-package main
-
-import (
-	"fmt"
-	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwbcode/gobatis"        // 引入gobatis
-)
-
-// 实体结构示例， tag：field为数据库对应字段名称
-type User struct {
-	Id    gobatis.NullInt64  `field:"id"`
-	Name  gobatis.NullString `field:"name"`
-	Email gobatis.NullString `field:"email"`
-	CrtTm gobatis.NullTime   `field:"crtTm"`
-}
-
-func main() {
-	// 初始化db
-	ds1 := gobatis.NewDataSourceBuilder().
-		DataSource("ds1").
-		DriverName("mysql").
-		DataSourceName("root:123456@tcp(127.0.0.1:3306)/test?charset=utf8").
-		MaxLifeTime(120).
-		MaxOpenConns(10).
-		MaxIdleConns(5).
-		Build()
-
-	option := gobatis.NewDSOption().
-		DS([]*gobatis.DataSource{ds1}).
-		Mappers([]string{"examples/mapper/userMapper.xml"}).
-		ShowSQL(true)
-
-	gobatis.Init(option)
-
-	// 获取数据源，参数为数据源名称，如：ds1
-	gb := gobatis.Get("ds1")
-
-	//传入id查询Map
-	mapRes := make(map[string]interface{})
-	// stmt标识为：namespace + '.' + id, 如：userMapper.findMapById
-	// 查询参数可以是map，也可以是数组，也可以是实体结构
-	_, err := gb.Select("userMapper.findMapById", map[string]interface{}{"id": 1})(mapRes)
-	fmt.Println("userMapper.findMapById-->", mapRes, err)
-}
-```
-
-example3.go
-
-```go
-package main
-
-import (
-	"database/sql"
-	"fmt"
-	_ "github.com/go-sql-driver/mysql" // 引入驱动
-	"github.com/hanwbcode/gobatis"        // 引入gobatis
-)
-
-// 实体结构示例， tag：field为数据库对应字段名称
-type User struct {
-	Id    gobatis.NullInt64  `field:"id"`
-	Name  gobatis.NullString `field:"name"`
-	Email gobatis.NullString `field:"email"`
-	CrtTm gobatis.NullTime   `field:"crtTm"`
-}
-
-func main() {
-	// 初始化db
-	db, _ := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8")
-	dbs := make(map[string]*gobatis.GoBatisDB)
-	dbs["ds1"] = gobatis.NewGoBatisDB(gobatis.DBTypeMySQL, db)
-
-	option := gobatis.NewDBOption().
-		DB(dbs).
-		ShowSQL(true).
-		Mappers([]string{"examples/mapper/userMapper.xml"})
-
-	gobatis.Init(option)
-
-	// 获取数据源，参数为数据源名称，如：ds1
-	gb := gobatis.Get("ds1")
-
-	//传入id查询Map
-	mapRes := make(map[string]interface{})
-	// stmt标识为：namespace + '.' + id, 如：userMapper.findMapById
-	// 查询参数可以是map，也可以是数组，也可以是实体结构
-	_, err := gb.Select("userMapper.findMapById", map[string]interface{}{"id": 1})(mapRes)
-	fmt.Println("userMapper.findMapById-->", mapRes, err)
-}
-```
-
-## 致谢
-
-感谢jetbrains提供的goland！

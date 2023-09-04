@@ -1,6 +1,8 @@
 package gobatis
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -36,9 +38,13 @@ func (this *mapperConfig) putSql(id string, n *node) bool {
 }
 
 func (this *mapperConfig) getXmlNode(id string) (rootNode *node, resultType string) {
+
 	rootNode, ok := this.mappedStmts[id]
+
 	if !ok {
-		panic("Can not find id:" + id + "mapped stmt")
+		sqlxml := fmt.Sprintf("%s", id)
+		sr := strings.NewReader(sqlxml)
+		rootNode = Parse(sr)
 	}
 
 	resultType = ""

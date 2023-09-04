@@ -13,7 +13,7 @@ func main() {
 
 	//engine := gobatis.NewPostgresql("postgresql://postgres:root@127.0.0.1:5432/test?connect_timeout=10&sslmode=disable")
 
-	engine := gobatis.NewClickhouse("clickhouse://root:clickhouse@2023@aaaaaaa:9000/cloud_cost_analysis_business")
+	engine := gobatis.NewClickhouse("clickhouse://root:clickhouse@2023@aaa:9000/cloud_cost_analysis_business")
 
 	err := engine.Init("./example2/sql/")
 

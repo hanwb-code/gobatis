@@ -139,7 +139,7 @@ func structToMap(s interface{}) map[string]interface{} {
 				if ok {
 					res[field.Name] = data
 					// 同时可以使用tag做参数名 https://github.com/hanwbcode/gobatis/issues/43
-					tag := field.Tag.Get("field")
+					tag := field.Tag.Get("db")
 					if tag != "" && tag != "-" {
 						res[tag] = data
 					}

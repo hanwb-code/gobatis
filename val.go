@@ -211,6 +211,8 @@ func valToString(data interface{}) string {
 		s = fmt.Sprint(data.(complex64))
 	case reflect.Complex128:
 		s = fmt.Sprint(data.(complex128))
+	case reflect.String:
+		s = data.(string)
 	default:
 		LOG.Warn("[WARN]no process for type:" + tp.Name())
 	}

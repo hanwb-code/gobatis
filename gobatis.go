@@ -304,6 +304,26 @@ func (t *TX) Rollback() error {
 	return sqlTx.Rollback()
 }
 
+func (g *gbBase) SelectV2(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
+	ms := g.config.mapperConf.getMappedStmt(stmt)
+	if nil == ms {
+		return func(res interface{}) (int64, error) {
+			return 0, errors.New("Mapped statement not found:" + stmt)
+		}
+	}
+	ms.dbType = g.dbType
+
+	params := paramProcess(param)
+
+	return func(res interface{}) (int64, error) {
+		executor := &executor{
+			gb: g,
+		}
+		count, err := executor.query(ms, params, res, rowBound...)
+		return count, err
+	}
+}
+
 // reference from https://github.com/yinshuwei/osm/blob/master/osm.go end
 func (g *gbBase) Select(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
 	ms := g.config.mapperConf.getMappedStmt(stmt)
@@ -326,7 +346,9 @@ func (g *gbBase) Select(stmt string, param interface{}, rowBound ...*rowBounds) 
 }
 
 func (g *gbBase) SelectContext(ctx context.Context, stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
+
 	ms := g.config.mapperConf.getMappedStmt(stmt)
+
 	if nil == ms {
 		return func(res interface{}) (int64, error) {
 			return 0, errors.New("Mapped statement not found:" + stmt)

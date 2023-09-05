@@ -79,6 +79,7 @@ func (this *mapperConfig) getMappedStmt(id string) *mappedStmt {
 }
 
 func (this *mapperConfig) buildSqlNode(id string) *mappedStmt {
+
 	rootNode, resultType := this.getXmlNode(id)
 
 	sn := this.createSqlNode(rootNode.Elements...)

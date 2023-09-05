@@ -4,6 +4,19 @@
     <sql id="Base_Column_List">
         id, name, crtTm, pwd, email
     </sql>
+
+    <select id="list" resultType="structs">
+        SELECT
+            id,
+            name
+        FROM
+            user
+        <where>
+            <if test="!$blank(Name)">and name = #{Name}</if>
+        </where>
+        order by id
+    </select>
+
     <select id="findIncludeMaps" resultType="maps">
         SELECT
         <include refid="Base_Column_List" />

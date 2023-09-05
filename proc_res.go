@@ -343,7 +343,7 @@ func rowsToStructs(rows *sql.Rows, resultType reflect.Type) ([]interface{}, erro
 	for i := 0; i < fields; i++ {
 		field := resultType.Field(i)
 		fieldsMapper[field.Name] = field.Name
-		tag := field.Tag.Get("field")
+		tag := field.Tag.Get("db")
 		if tag != "" {
 			fieldsMapper[tag] = field.Name
 		}

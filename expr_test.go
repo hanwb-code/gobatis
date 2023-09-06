@@ -11,6 +11,17 @@ type TestUser struct {
 	Name string
 }
 
+func TestExpr_eval1(t *testing.T) {
+
+	params := map[string]interface{}{
+		"accountId": "A",
+	}
+
+	ok := eval(`accountId != nil`, params)
+
+	fmt.Println(ok)
+}
+
 func TestExpr_eval(t *testing.T) {
 	params := map[string]interface{}{
 		"name": "wen",

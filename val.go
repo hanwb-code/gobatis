@@ -213,8 +213,10 @@ func valToString(data interface{}) string {
 		s = fmt.Sprint(data.(complex128))
 	case reflect.String:
 		s = data.(string)
+	case reflect.Ptr:
+		s = reflect.ValueOf(data).Elem().String()
 	default:
-		LOG.Warn("[WARN]no process for type:" + tp.Name())
+		LOG.Warn("[WARN]no process for type:" + tp.Name() + " " + tp.Kind().String())
 	}
 	return s
 }

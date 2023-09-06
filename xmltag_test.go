@@ -31,12 +31,12 @@ func TestTextSqlNode_build(t *testing.T) {
 func TestIfSqlNode_True_build(t *testing.T) {
 	ctx := &dynamicContext{
 		params: map[string]interface{}{
-			"name": "wenj91",
+			"name": "wen",
 		},
 	}
 
 	ifSqlNode := &ifSqlNode{
-		test: "name == 'wenj91'",
+		test: "name == 'wen'",
 		sqlNode: &textSqlNode{
 			content: "select 1 from t_gap",
 		},
@@ -51,12 +51,12 @@ func TestIfSqlNode_True_build(t *testing.T) {
 func TestIfSqlNode_False_build(t *testing.T) {
 	ctx := &dynamicContext{
 		params: map[string]interface{}{
-			"name": "wenj91",
+			"name": "wen",
 		},
 	}
 
 	ifSqlNode := &ifSqlNode{
-		test: "name != 'wenj91'",
+		test: "name != 'wen'",
 		sqlNode: &textSqlNode{
 			content: "select 1 from t_gap",
 		},
@@ -99,7 +99,7 @@ func TestForeachSqlNode_build(t *testing.T) {
 
 func TestMixedSqlNode_build(t *testing.T) {
 	params := map[string]interface{}{
-		"name":   "wenj91",
+		"name":   "wen",
 		"array":  []map[string]interface{}{{"idea": "11"}, {"idea": "22"}, {"idea": "33"}},
 		"array1": []string{"11", "22", "33"},
 		"array2": []s{{A: "aa"}, {A: "bb"}, {A: "cc"}},
@@ -111,7 +111,7 @@ func TestMixedSqlNode_build(t *testing.T) {
 				content: "select 1 from t_gap where 1 = 1",
 			},
 			&ifSqlNode{
-				test: "name == 'wenj91'",
+				test: "name == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "and name = #{name}",
 				},
@@ -152,20 +152,20 @@ func TestMixedSqlNode_build(t *testing.T) {
 
 func TestSetSqlNode_build(t *testing.T) {
 	params := map[string]interface{}{
-		"name":  "wenj91",
-		"name2": "wenj91",
+		"name":  "wen",
+		"name2": "wen",
 	}
 
 	setSqlNode := &setSqlNode{
 		sqlNodes: []iSqlNode{
 			&ifSqlNode{
-				test: "name == 'wenj91'",
+				test: "name == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "name = #{name}",
 				},
 			},
 			&ifSqlNode{
-				test: "name2 == 'wenj91'",
+				test: "name2 == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "name2 = #{name2}",
 				},
@@ -179,14 +179,14 @@ func TestSetSqlNode_build(t *testing.T) {
 
 	expc := "set  name = #{name}  , name2 = #{name2}"
 	assert.Equal(t, ctx.toSql(), expc, "test failed, actual:"+ctx.toSql())
-	assert.Equal(t, ctx.params["name"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
-	assert.Equal(t, ctx.params["name2"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
+	assert.Equal(t, ctx.params["name"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
+	assert.Equal(t, ctx.params["name2"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
 }
 
 func TestTrimSqlNode_build(t *testing.T) {
 	params := map[string]interface{}{
-		"name":  "wenj91",
-		"name2": "wenj91",
+		"name":  "wen",
+		"name2": "wen",
 	}
 
 	trimSqlNode := &trimSqlNode{
@@ -194,13 +194,13 @@ func TestTrimSqlNode_build(t *testing.T) {
 		suffixOverrides: ",",
 		sqlNodes: []iSqlNode{
 			&ifSqlNode{
-				test: "name == 'wenj91'",
+				test: "name == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "and name = #{name}",
 				},
 			},
 			&ifSqlNode{
-				test: "name2 == 'wenj91'",
+				test: "name2 == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "and name2 = #{name2}",
 				},
@@ -214,26 +214,26 @@ func TestTrimSqlNode_build(t *testing.T) {
 
 	expc := "name = #{name}  and name2 = #{name2}"
 	assert.Equal(t, ctx.toSql(), expc, "test failed, actual:"+ctx.toSql())
-	assert.Equal(t, ctx.params["name"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
-	assert.Equal(t, ctx.params["name2"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
+	assert.Equal(t, ctx.params["name"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
+	assert.Equal(t, ctx.params["name2"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
 }
 
 func TestWhereSqlNode_build(t *testing.T) {
 	params := map[string]interface{}{
-		"name":  "wenj91",
-		"name2": "wenj91",
+		"name":  "wen",
+		"name2": "wen",
 	}
 
 	whereSqlNode := &whereSqlNode{
 		sqlNodes: []iSqlNode{
 			&ifSqlNode{
-				test: "name == 'wenj91'",
+				test: "name == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "and name = #{name}",
 				},
 			},
 			&ifSqlNode{
-				test: "name2 == 'wenj91'",
+				test: "name2 == 'wen'",
 				sqlNode: &textSqlNode{
 					content: "and name2 = #{name2}",
 				},
@@ -247,8 +247,8 @@ func TestWhereSqlNode_build(t *testing.T) {
 
 	expc := "where name = #{name}  and name2 = #{name2}"
 	assert.Equal(t, ctx.toSql(), expc, "test failed, actual:"+ctx.toSql())
-	assert.Equal(t, ctx.params["name"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
-	assert.Equal(t, ctx.params["name2"], "wenj91", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
+	assert.Equal(t, ctx.params["name"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name"]))
+	assert.Equal(t, ctx.params["name2"], "wen", "test failed, actual:"+fmt.Sprintf("%s", ctx.params["name2"]))
 }
 
 func TestChooseSqlNode_build(t *testing.T) {

@@ -20,12 +20,12 @@ func TestParams(t *testing.T) {
 
 	paramM := map[string]interface{}{
 		"id":   nil,
-		"name": "wenj91",
+		"name": "wen",
 	}
 	res = paramProcess(paramM)
 	assert.Nil(t, res["id"], "test fail: res['id'] != nil")
 	assert.NotNil(t, res["name"], "test fail: res['name'] == nil")
-	assert.Equal(t, res["name"], "wenj91", "test fail: res['name'] != 'wenj91'")
+	assert.Equal(t, res["name"], "wen", "test fail: res['name'] != 'wen'")
 
 	paramNil := NullString{"str", true}
 	res = paramProcess(paramNil)

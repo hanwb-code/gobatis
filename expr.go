@@ -24,16 +24,18 @@ func blank(arg interface{}) bool {
 	return false
 }
 
-func eval(expression string, mapper map[string]interface{}) bool {
-	env := map[string]interface{}{
-		"$blank": blank,
-	}
+func eval(expression string, env map[string]interface{}) bool {
 
-	for k, v := range mapper {
-		env[k] = v
-	}
+	//env := map[string]interface{}{
+	//	"$blank": blank,
+	//}
+	//
+	//for k, v := range mapper {
+	//	env[k] = v
+	//}
 
-	program, err := expr.Compile(expression, expr.Env(env))
+	program, err := expr.Compile(expression, expr.Env(env), expr.AllowUndefinedVariables())
+
 	if err != nil {
 		LOG.Debug("[WARN]", "Expression:", expression, ">>> Compile result err:", err)
 		return false

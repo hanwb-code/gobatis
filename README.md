@@ -1,15 +1,11 @@
 # gobatis
 
-[![CodeQL](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/hanwbcode/gobatis/actions/workflows/codeql.yml)
-
 目前代码都是基于类mysql数据库编写测试的,其他数据库暂时还未做兼容处理
 
 - [x] 支持数据库
   - [x] mysql
-  - [x] tidb
-  - [x] mariadb
-  - [ ] postgres
-  - [ ] sqlite
+  - [x] clickhouse
+  - [x] postgres
 - [x] 基础操作
   - [x] query
   - [x] insert
@@ -19,12 +15,6 @@
 ## ToDo
 
 - 增加更多易用表达式指令，目前已有`$blank`指令用于判别字符串是否为空的指令，比如判断name为空串： test="$blank(name)"
-
-## 模板代码生成
-
-提供了简单的增删改查代码自动生成
-
-具体操作看仓库： [https://github.com/wenj91/mctl.git](https://github.com/wenj91/mctl.git)
 
 ## gobatis接口
 

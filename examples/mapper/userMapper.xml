@@ -88,11 +88,14 @@
         </set>
         where id = #{Id}
     </update>
+
     <insert id="saveUser">
         insert into user (name, email, crtTm)
         values (#{Name}, #{Email}, #{CrtTm})
     </insert>
+
     <delete id="deleteById">
         delete from user where id=#{id}
     </delete>
+    
 </mapper>

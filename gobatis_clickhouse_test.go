@@ -14,7 +14,7 @@ type TUser2 struct {
 
 func TestGoBatisWithDBCli(t *testing.T) {
 
-	db, _ := sql.Open("clickhouse", "clickhouse://root:clickhouse@2023@a4dc6a21b05dc4a2b9b4e5caf3c0dbf6-1988808241.ap-northeast-1.elb.amazonaws.com:9000/cloud_cost_analysis_business")
+	db, _ := sql.Open("clickhouse", "clickhouse://root:12345@127.0.0.1:9000/cloud_cost_analysis_business")
 	dbs := make(map[string]*GoBatisDB)
 	dbs["ds"] = NewGoBatisDB(DBTypeClickhouse, db)
 
@@ -38,25 +38,35 @@ func TestGoBatisWithDBCli(t *testing.T) {
 	//
 	//fmt.Println("result:", result, "err:", err)
 
-	param := &TUser2{}
+	//param := &TUser2{}
+	//
+	//res := make([]*TUser2, 0)
+	//
+	//_, err := gb.Select(`
+	//	<select id="list" resultType="structs">
+	//		SELECT
+	//			id,
+	//			name
+	//		FROM
+	//			users
+	//		<where>
+	//			<if test="Name != nil and Name != ''">and name = #{Name}</if>
+	//		</where>
+	//	</select>
+	//`, param)(&res)
+	//
+	//for _, re := range res {
+	//	fmt.Printf("list %+v\n", re)
+	//}
 
-	res := make([]*TUser2, 0)
-
-	_, err := gb.Select(`
-		<select id="list" resultType="structs">
-			SELECT
-				id,
-				name
-			FROM
-				user
-			<where>
-				<if test="Name != nil and Name != ''">and name = #{Name}</if>
-			</where>
-		</select>
-	`, param)(&res)
-
-	fmt.Println(err)
-	for _, re := range res {
-		fmt.Printf("list %+v\n", re)
+	uu := &Users{
+		Id:   1,
+		Name: "1993",
 	}
+
+	// test set
+	affected, err := gb.Update("userMapper.updateByCond", uu)
+
+	fmt.Println("updateByCond:", affected, err)
+
 }

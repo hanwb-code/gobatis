@@ -10,6 +10,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type Users struct {
+	Id   int64  `field:"id"`
+	Name string `field:"name"`
+}
+
 type TUser struct {
 	Id       int64      `field:"id"`
 	Name     string     `field:"name"`

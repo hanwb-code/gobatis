@@ -23,7 +23,7 @@ func (exec *executor) insertBatchContext(ctx context.Context, ms *mappedStmt, pa
 	}
 
 	result, err := exec.gb.db.Exec(boundSql.sqlStr, paramArr...)
-	
+
 	lastInsertId, err = result.LastInsertId()
 
 	if nil != err {

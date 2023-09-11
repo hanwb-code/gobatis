@@ -41,18 +41,18 @@ type GoBatis interface {
 	DeleteContext(ctx context.Context, stmt string, param interface{}) (affected int64, err error)
 }
 
-// reference from https://github.com/yinshuwei/osm/blob/master/osm.go start
-type dbRunner interface {
-	//Begin() (*sql.Tx, error)
-	Prepare(query string) (*sql.Stmt, error)
-	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
-	Exec(query string, args ...interface{}) (sql.Result, error)
-	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
-	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
-}
+//// reference from https://github.com/yinshuwei/osm/blob/master/osm.go start
+//type dbRunner interface {
+//	//Begin() (*sql.Tx, error)
+//	Prepare(query string) (*sql.Stmt, error)
+//	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
+//	Exec(query string, args ...interface{}) (sql.Result, error)
+//	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
+//	Query(query string, args ...interface{}) (*sql.Rows, error)
+//	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
+//	QueryRow(query string, args ...interface{}) *sql.Row
+//	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
+//}
 
 func Get(datasource string) *DB {
 	if nil == conf {
@@ -109,7 +109,7 @@ func RowBounds(offset int, limit int) *rowBounds {
 }
 
 type gbBase struct {
-	db     dbRunner
+	db     *sql.DB
 	dbType DBType
 	config *config
 }
@@ -133,29 +133,33 @@ var _ GoBatis = &TX{}
 // ps：
 //
 //	TX, err := this.Begin()
-func (d *DB) Begin() (*TX, error) {
+func (d *DB) Begin() (*sql.Tx, error) {
 	if nil == d.db {
 		return nil, errors.New("db no opened")
 	}
 
-	sqlDB, ok := d.db.(*sql.DB)
-	if !ok {
-		return nil, errors.New("db no opened")
-	}
+	tx, err := d.db.Begin()
 
-	db, err := sqlDB.Begin()
-	if nil != err {
-		return nil, err
-	}
+	return tx, err
 
-	t := &TX{
-		gbBase{
-			dbType: d.dbType,
-			config: d.config,
-			db:     db,
-		},
-	}
-	return t, nil
+	//sqlDB, ok := d.db.(*sql.DB)
+	//if !ok {
+	//	return nil, errors.New("db no opened")
+	//}
+	//
+	//db, err := sqlDB.Begin()
+	//if nil != err {
+	//	return nil, err
+	//}
+	//
+	//t := &TX{
+	//	gbBase{
+	//		dbType: d.dbType,
+	//		config: d.config,
+	//		db:     db,
+	//	},
+	//}
+	//return t, nil
 }
 
 // Begin TX with ctx & opts
@@ -163,33 +167,37 @@ func (d *DB) Begin() (*TX, error) {
 // ps：
 //
 //	TX, err := this.BeginTx(ctx, ops)
-func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*TX, error) {
+func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
 	if nil == d.db {
 		return nil, errors.New("db no opened")
 	}
 
-	sqlDb, ok := d.db.(*sql.DB)
-	if !ok {
-		return nil, errors.New("db no opened")
-	}
+	db, err := d.db.BeginTx(ctx, opts)
 
-	db, err := sqlDb.BeginTx(ctx, opts)
-	if nil != err {
-		return nil, err
-	}
+	return db, err
 
-	t := &TX{
-		gbBase{
-			dbType: d.dbType,
-			config: d.config,
-			db:     db,
-		},
-	}
-	return t, nil
+	//sqlDb, ok := d.db.(*sql.DB)
+	//if !ok {
+	//	return nil, errors.New("db no opened")
+	//}
+	//
+	//db, err := sqlDb.BeginTx(ctx, opts)
+	//if nil != err {
+	//	return nil, err
+	//}
+	//
+	//t := &TX{
+	//	gbBase{
+	//		dbType: d.dbType,
+	//		config: d.config,
+	//		db:     db,
+	//	},
+	//}
+	//return t, nil
 }
 
 // Transaction tx
-func (d *DB) Transaction(fn func(tx *TX) error) error {
+func (d *DB) Transaction(fn func(tx *sql.Tx) error) error {
 
 	tx, err := d.Begin()
 	if nil != err {
@@ -219,7 +227,7 @@ func (d *DB) Transaction(fn func(tx *TX) error) error {
 }
 
 // Transaction tx
-func (d *DB) TransactionTX(ctx context.Context, opts *sql.TxOptions, fn func(tx *TX) error) error {
+func (d *DB) TransactionTX(ctx context.Context, opts *sql.TxOptions, fn func(tx *sql.Tx) error) error {
 
 	tx, err := d.BeginTx(ctx, opts)
 	if nil != err {
@@ -258,12 +266,12 @@ func (g *gbBase) Close() error {
 		return errors.New("db no opened")
 	}
 
-	sqlDb, ok := g.db.(*sql.DB)
-	if !ok {
-		return errors.New("db no opened")
-	}
+	//sqlDb, ok := g.db.(*sql.DB)
+	//if !ok {
+	//	return errors.New("db no opened")
+	//}
 
-	err := sqlDb.Close()
+	err := g.db.Close()
 	g.db = nil
 	return err
 }
@@ -273,37 +281,37 @@ func (g *gbBase) Close() error {
 // ps：
 //
 //	err := TX.Commit()
-func (t *TX) Commit() error {
-	if nil == t.db {
-		return errors.New("TX no running")
-	}
-
-	sqlTx, ok := t.db.(*sql.Tx)
-	if !ok {
-		return errors.New("TX no running")
-
-	}
-
-	return sqlTx.Commit()
-}
+//func (t *TX) Commit() error {
+//	if nil == t.db {
+//		return errors.New("TX no running")
+//	}
+//
+//	sqlTx, ok := t.db.(*sql.Tx)
+//	if !ok {
+//		return errors.New("TX no running")
+//
+//	}
+//
+//	return t.db.Commit()
+//}
 
 // Rollback TX
 //
 // ps：
 //
 //	err := TX.Rollback()
-func (t *TX) Rollback() error {
-	if nil == t.db {
-		return errors.New("TX no running")
-	}
-
-	sqlTx, ok := t.db.(*sql.Tx)
-	if !ok {
-		return errors.New("TX no running")
-	}
-
-	return sqlTx.Rollback()
-}
+//func (t *TX) Rollback() error {
+//	if nil == t.db {
+//		return errors.New("TX no running")
+//	}
+//
+//	sqlTx, ok := t.db.(*sql.Tx)
+//	if !ok {
+//		return errors.New("TX no running")
+//	}
+//
+//	return sqlTx.Rollback()
+//}
 
 func (g *gbBase) SelectV2(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
 	ms := g.config.mapperConf.getMappedStmt(stmt)

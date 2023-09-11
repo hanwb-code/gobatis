@@ -39,7 +39,7 @@ func rv(v interface{}) reflect.Value {
 
 func TestEngine(t *testing.T) {
 
-	engine := NewPostgresql("postgresql://postgres:postgres@127.0.0.1:5432/gobatis?connect_timeout=10&sslmode=disable")
+	engine := NewPostgresql("postgresql://postgres:root@127.0.0.1:5432/gobatis?connect_timeout=10&sslmode=disable")
 	err := engine.Init("test")
 	require.NoError(t, err)
 

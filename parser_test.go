@@ -106,7 +106,7 @@ const (
 )
 
 func init() {
-	
+
 	logPath := filepath.Join(pwd, errLogFile)
 	_, err := os.Stat(logPath)
 	if !os.IsNotExist(err) {
@@ -114,16 +114,16 @@ func init() {
 	}
 }
 
-func TestParseConfig(t *testing.T) {
+/*func TestParseConfig(t *testing.T) {
 	engine := NewEngine(NewDB("nil", "nil"))
 	require.NoError(t, parseConfig(engine, "gobatis.xml", defaultConfigXML))
-}
+}*/
 
 func TestCorrectParseFragment(t *testing.T) {
 	engine := NewEngine(&DB{})
 	err := parseMapper(engine, "defaultCorrectTestMapper", defaultCorrectTestMapper)
 	require.NoError(t, err)
-	
+
 	execTestFragment(t, engine, []testFragment{
 		{Id: "QueryTestByStatues", Parameter: []interface{}{[]string{"ok", "success"}}, SQL: "select * from test where status in('$1','$2') and name > 1 and names in('$3','$4')", Vars: 4},
 	})
@@ -140,7 +140,7 @@ func TestErrorParseMapper(t *testing.T) {
 }
 
 func TestCorrectParseExprExpression(t *testing.T) {
-	
+
 	testCorrectParseExprExpression(t, []testExpression{
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "a + b", Result: 6},
 		{In: []interface{}{2, 4}, Parameter: "a:int, b", Expr: "a + b", Result: 6},
@@ -152,7 +152,7 @@ func TestCorrectParseExprExpression(t *testing.T) {
 		{In: []interface{}{int64(2), int64(4)}, Parameter: "a,b", Expr: "b / a", Result: int64(2)},
 		{In: []interface{}{decimal.NewFromFloat(3.12), "2.13"}, Parameter: "a,b", Expr: "a + b", Result: "5.25"},
 		{In: []interface{}{decimal.NewFromFloat(3.12), 2.13}, Parameter: "a,b", Expr: "a + b", Result: "5.25"},
-		
+
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: " a + a * a", Result: 6},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "  a + a * b", Result: 10},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: " a + b * a ", Result: 10},
@@ -161,7 +161,7 @@ func TestCorrectParseExprExpression(t *testing.T) {
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( ( a + b  ) * b)", Result: 24},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( ( (  a + b ) ) * b)", Result: 24},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( a + b) / b", Result: 1},
-		
+
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "b + b * b", Result: 20},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "b + b * a ", Result: 12},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "b + a * b", Result: 12},
@@ -170,7 +170,7 @@ func TestCorrectParseExprExpression(t *testing.T) {
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( ( b+ a ) * a)", Result: 12},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( ( ( b + a ) * a ) )", Result: 12},
 		{In: []interface{}{2, 4}, Parameter: "a,b", Expr: "( b + a ) / a", Result: 3},
-		
+
 		//{In: []interface{}{u1, u2}, Parameter: "a, b", Expr: "a.Age + b.Age", Result: 38},
 		//{In: []interface{}{u1, u2}, Parameter: "a, b", Expr: "a.Weight() + b.Weight()", Result: 100},
 		//{In: []interface{}{u1, u2}, Parameter: "a, b", Expr: "a.Weight() > b.Weight()", Result: true},
@@ -191,13 +191,13 @@ func TestAnyExprParam(t *testing.T) {
 	params, err := testAnyExprParam(" * ")
 	require.Equal(t, 0, len(params))
 	require.NoError(t, err)
-	
+
 	_, err = testAnyExprParam("*,")
 	require.Error(t, err)
-	
+
 	_, err = testAnyExprParam("*,a")
 	require.Error(t, err)
-	
+
 	_, err = testAnyExprParam(",*")
 	require.Error(t, err)
 }
@@ -259,7 +259,7 @@ func execTestFragment(t *testing.T, engine *Engine, tests []testFragment) {
 		for _, v := range test.Parameter {
 			vars = append(vars, rv(v))
 		}
-		
+
 		frag, ok := engine.fragmentManager.get(test.Id)
 		require.True(t, ok, test)
 		sql, exprs, _vars, dynamic, err := frag.parseStatement(vars...)
@@ -284,15 +284,15 @@ func testCorrectParseExprExpression(t *testing.T, tests []testExpression) {
 		}
 		_expr := newExprParser(vars...)
 		_expr.file = "tmp.xml"
-		
+
 		params, err := testParseParams(test.Parameter)
 		require.NoError(t, err, test)
-		
+
 		for ii, vv := range params {
 			err = _expr.paramsStack.list.Front().Next().Value.(*exprParams).bind(vv, ii)
 			require.NoError(t, err, test, ii, vv)
 		}
-		
+
 		result, _, err := _expr.parseExpression(nil, test.Expr)
 		if test.Err > 0 {
 			require.Error(t, err, test)

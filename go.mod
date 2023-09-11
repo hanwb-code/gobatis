@@ -1,4 +1,4 @@
-module github.com/gobatis/gobatis
+module github.com/hanwbcode/gobatis
 
 go 1.21
 

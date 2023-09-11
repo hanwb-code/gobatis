@@ -338,14 +338,23 @@ func rowsToSlices(rows *sql.Rows) ([]interface{}, error) {
 }
 
 func rowsToStructs(rows *sql.Rows, resultType reflect.Type) ([]interface{}, error) {
+
 	fieldsMapper := make(map[string]string)
+
 	fields := resultType.NumField()
+
 	for i := 0; i < fields; i++ {
 		field := resultType.Field(i)
 		fieldsMapper[field.Name] = field.Name
-		tag := field.Tag.Get("db")
-		if tag != "" {
-			fieldsMapper[tag] = field.Name
+
+		// 检查是否存在db标签，如果不存在则使用json标签
+		if dbTag := field.Tag.Get("db"); dbTag != "" && dbTag != "-" {
+			fieldsMapper[dbTag] = field.Name
+		} else {
+			jsonTag := field.Tag.Get("json")
+			if jsonTag != "" && jsonTag != "-" {
+				fieldsMapper[jsonTag] = field.Name
+			}
 		}
 	}
 

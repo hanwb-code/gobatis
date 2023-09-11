@@ -138,10 +138,15 @@ func structToMap(s interface{}) map[string]interface{} {
 				data, ok := fieldToVal(fieldVal.Interface())
 				if ok {
 					res[field.Name] = data
-					// 同时可以使用tag做参数名 https://github.com/hanwbcode/gobatis/issues/43
-					tag := field.Tag.Get("db")
-					if tag != "" && tag != "-" {
-						res[tag] = data
+					// 检查是否存在db标签，如果不存在则使用json标签
+					var paramName string
+					if dbTag := field.Tag.Get("db"); dbTag != "" && dbTag != "-" {
+						paramName = dbTag
+					} else {
+						paramName = field.Tag.Get("json")
+					}
+					if paramName != "" {
+						res[paramName] = data
 					}
 				}
 			}

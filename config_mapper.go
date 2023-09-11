@@ -61,6 +61,7 @@ func (this *mapperConfig) getXmlNode(id string) (rootNode *node, resultType stri
 }
 
 func (this *mapperConfig) getMappedStmt(id string) *mappedStmt {
+
 	if nil == this.cache {
 		this.cache = make(map[string]*mappedStmt)
 	}

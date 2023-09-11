@@ -327,12 +327,19 @@ func (g *gbBase) SelectV2(stmt string, param interface{}, rowBound ...*rowBounds
 
 // reference from https://github.com/yinshuwei/osm/blob/master/osm.go end
 func (g *gbBase) Select(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
+
+	//if strings.HasPrefix(stmt, "<select>") {
+	//	stmt = fmt.Sprintf("<select>%s</select>", stmt)
+	//}
+
 	ms := g.config.mapperConf.getMappedStmt(stmt)
+
 	if nil == ms {
 		return func(res interface{}) (int64, error) {
 			return 0, errors.New("Mapped statement not found:" + stmt)
 		}
 	}
+
 	ms.dbType = g.dbType
 
 	params := paramProcess(param)

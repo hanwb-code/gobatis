@@ -39,57 +39,6 @@ type GoBatis interface {
 }
 ```
 
-## db数据源配置
-- 支持多数据源配置
-- db子级配置为一个map，map的key即为数据源名称标识  
-- map的value为数据源具体配置，具体配置项如下表
-
-| 配置 | 是否必填配置 | 默认值 | 说明 |
-|:---|:----:|:----:|----|
-| driverName | 是 | | 数据源驱动名，必填配置项
-| dataSourceName | 是 | | 数据源名称，必填配置项，例如: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-| maxLifeTime | 否 | 120(单位: s)| 连接最大存活时间，默认值为: 120 单位为: s
-| maxOpenConns | 否 | 10 | 最大打开连接数，默认值为: 10
-| maxIdleConns | 否 | 5 | 最大挂起连接数，默认值为: 5
-
-### 示例
-* db配置示例(配置较之前的有所调整)  
-以下为多数据源配置示例: db.yml
-```yaml
-# 数据库配置
-db:
-  # 数据源名称1
-  - datasource: ds1
-    # 驱动名
-    driverName: mysql
-    # 数据源
-    dataSourceName: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-    # 连接最大存活时间（单位: s）
-    maxLifeTime: 120
-    # 最大open连接数
-    maxOpenConns: 10
-    # 最大挂起连接数
-    maxIdleConns: 5
-  # 数据源名称2
-  - datasource: ds2
-    # 驱动名
-    driverName: mysql
-    # 数据源
-    dataSourceName: root:123456@tcp(127.0.0.1:3306)/test?charset=utf8
-    # 连接最大存活时间（单位: s）
-    maxLifeTime: 120
-    # 最大open连接数
-    maxOpenConns: 10
-    # 最大挂起连接数
-    maxIdleConns: 5
-# 是否显示SQL语句
-showSql: true
-# 数据表映射文件路径配置
-mappers:
-  # 映射文件路径， 可以为绝对路径，如: /usr/local/mapper/userMapper.xml
-  - mapper/userMapper.xml
-```
-
 * mapper配置  
 1. mapper可以配置namespace属性  
 1. mapper可以包含: select, insert, update, delete标签  

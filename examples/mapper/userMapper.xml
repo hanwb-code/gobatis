@@ -23,21 +23,27 @@
         FROM user
         limit 10
     </select>
+
     <select id="findMapById" resultType="map">
         SELECT id, name FROM user where id=#{id} order by id
     </select>
+
     <select id="findMapByValue" resultType="map">
         SELECT id, name FROM user where id=#{0} order by id
     </select>
+
     <select id="findStructByStruct" resultType="struct">
         SELECT id, name, crtTm FROM user where id=#{Id} order by id
     </select>
+
     <select id="findById" resultType="struct">
         SELECT id, name FROM user where id=#{id} order by id
     </select>
+
     <select id="queryStructs" resultType="structs">
         SELECT id, name, crtTm FROM user order by id
     </select>
+
     <select id="queryStructsByCond" resultType="structs">
         SELECT id, name, crtTm, pwd, email FROM user
         <where>

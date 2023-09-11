@@ -10,8 +10,39 @@ type executor struct {
 	gb *gbBase
 }
 
-func (exec *executor) updateContext(ctx context.Context, ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {
+func (exec *executor) insertBatchContext(ctx context.Context, ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {
+
 	boundSql, paramArr, err := paramProc(ms, params)
+
+	if nil != err {
+		return 0, 0, err
+	}
+
+	if conf.dbConf.ShowSQL {
+		LOG.Info("SQL:%s\nParamMappings:%s\nParams:%v", boundSql.sqlStr, boundSql.paramMappings, paramArr)
+	}
+
+	result, err := exec.gb.db.Exec(boundSql.sqlStr, paramArr...)
+	
+	lastInsertId, err = result.LastInsertId()
+
+	if nil != err {
+		return 0, 0, err
+	}
+	affected, err = result.RowsAffected()
+	if nil != err {
+		return 0, 0, err
+	}
+
+	return lastInsertId, affected, nil
+
+	return lastInsertId, affected, nil
+}
+
+func (exec *executor) updateContext(ctx context.Context, ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {
+
+	boundSql, paramArr, err := paramProc(ms, params)
+
 	if nil != err {
 		return 0, 0, err
 	}
@@ -41,6 +72,14 @@ func (exec *executor) updateContext(ctx context.Context, ms *mappedStmt, params 
 	}
 
 	return lastInsertId, affected, nil
+}
+
+func (exec *executor) insertBatch(ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {
+	return exec.insertBatchContext(context.Background(), ms, params)
+}
+
+func (exec *executor) insert(ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {
+	return exec.updateContext(context.Background(), ms, params)
 }
 
 func (exec *executor) update(ms *mappedStmt, params map[string]interface{}) (lastInsertId int64, affected int64, err error) {

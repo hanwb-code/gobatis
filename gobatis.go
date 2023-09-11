@@ -43,6 +43,7 @@ type GoBatis interface {
 
 // reference from https://github.com/yinshuwei/osm/blob/master/osm.go start
 type dbRunner interface {
+	//Begin() (*sql.Tx, error)
 	Prepare(query string) (*sql.Stmt, error)
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 	Exec(query string, args ...interface{}) (sql.Result, error)
@@ -367,12 +368,14 @@ func (g *gbBase) SelectContext(ctx context.Context, stmt string, param interface
 	}
 }
 
-// insert(stmt string, param interface{})
-func (g *gbBase) Insert(stmt string, param interface{}) (int64, int64, error) {
+func (g *gbBase) InsertBatch(stmt string, param interface{}) (int64, int64, error) {
+
 	ms := g.config.mapperConf.getMappedStmt(stmt)
+
 	if nil == ms {
 		return 0, 0, errors.New("Mapped statement not found:" + stmt)
 	}
+
 	ms.dbType = g.dbType
 
 	params := paramProcess(param)
@@ -381,7 +384,34 @@ func (g *gbBase) Insert(stmt string, param interface{}) (int64, int64, error) {
 		gb: g,
 	}
 
-	lastInsertId, affected, err := executor.update(ms, params)
+	lastInsertId, affected, err := executor.insertBatch(ms, params)
+
+	if nil != err {
+		return 0, 0, err
+	}
+
+	return lastInsertId, affected, nil
+}
+
+// insert(stmt string, param interface{})
+func (g *gbBase) Insert(stmt string, param interface{}) (int64, int64, error) {
+
+	ms := g.config.mapperConf.getMappedStmt(stmt)
+
+	if nil == ms {
+		return 0, 0, errors.New("Mapped statement not found:" + stmt)
+	}
+
+	ms.dbType = g.dbType
+
+	params := paramProcess(param)
+
+	executor := &executor{
+		gb: g,
+	}
+
+	lastInsertId, affected, err := executor.insert(ms, params)
+
 	if nil != err {
 		return 0, 0, err
 	}

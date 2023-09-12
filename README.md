@@ -63,8 +63,7 @@ value: 则数据库查询结果为单个数值
 以下是mapper配置示例: mapper/userMapper.xml
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "gobatis"
-        "https://raw.githubusercontent.com/wenj91/gobatis/master/gobatis.dtd">
+<!DOCTYPE mapper PUBLIC "gobatis" "https://raw.githubusercontent.com/hanwbcode/gobatis/main/gobatis.dtd">
 <mapper namespace="userMapper">
     <sql id="Base_Column_List">
         id, name, crtTm, pwd, email
@@ -176,14 +175,14 @@ func main() {
 
 	param = User{
 		Id:   gobatis.NullInt64{Int64: 1, Valid: true},
-		Name: gobatis.NullString{String: "wenj1993", Valid: true},
+		Name: gobatis.NullString{String: "test3", Valid: true},
 	}
 
 	// set tag
 	affected, err := gb.Update("userMapper.updateByCond", param)
 	fmt.Println("updateByCond:", affected, err)
 
-	param = User{Name: gobatis.NullString{String: "wenj1993", Valid: true}}
+	param = User{Name: gobatis.NullString{String: "test3", Valid: true}}
 	// where tag
 	res := make([]*User, 0)
 	_, err = gb.Select("userMapper.queryStructsByCond", param)(&res)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "gobatis" "https://raw.githubusercontent.com/wenj91/gobatis/master/gobatis.dtd">
+<!DOCTYPE mapper PUBLIC "gobatis" "https://raw.githubusercontent.com/hanwbcode/gobatis/main/gobatis.dtd">
 <mapper namespace="userMapper">
     <sql id="Base_Column_List">
         id, name, crtTm, pwd, email

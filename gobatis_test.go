@@ -50,7 +50,7 @@ func TestGoBatis(t *testing.T) {
 	fmt.Println("result:", result, "err:", err)
 
 	u := &TUser{
-		Name: "wenj1991",
+		Name: "test1",
 		Password: NullString{
 			String: "654321",
 			Valid:  true,
@@ -62,7 +62,7 @@ func TestGoBatis(t *testing.T) {
 
 	uu := &TUser{
 		Id:   1,
-		Name: "wenj1993",
+		Name: "test3",
 		Password: NullString{
 			String: "654321",
 			Valid:  true,
@@ -74,7 +74,7 @@ func TestGoBatis(t *testing.T) {
 	fmt.Println("updateByCond:", affected, err)
 
 	param := &TUser{
-		Name: "wenj1993",
+		Name: "test3",
 	}
 
 	// test where
@@ -175,7 +175,7 @@ func TestGoBatisWithCodeConf(t *testing.T) {
 	fmt.Println("result:", result, "err:", err)
 
 	u := &TUser{
-		Name: "wenj1991",
+		Name: "test1",
 		Password: NullString{
 			String: "654321",
 			Valid:  true,
@@ -187,7 +187,7 @@ func TestGoBatisWithCodeConf(t *testing.T) {
 
 	uu := &TUser{
 		Id:   1,
-		Name: "wenj1993",
+		Name: "test3",
 		Password: NullString{
 			String: "654321",
 			Valid:  true,
@@ -199,7 +199,7 @@ func TestGoBatisWithCodeConf(t *testing.T) {
 	fmt.Println("updateByCond:", affected, err)
 
 	param := &TUser{
-		Name: "wenj1993",
+		Name: "test3",
 	}
 
 	// test where

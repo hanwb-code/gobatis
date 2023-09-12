@@ -51,21 +51,12 @@ func (exec *executor) updateContext(ctx context.Context, ms *mappedStmt, params 
 		LOG.Info("SQL:%s\nParamMappings:%s\nParams:%v", boundSql.sqlStr, boundSql.paramMappings, paramArr)
 	}
 
-	stmt, err := exec.gb.db.PrepareContext(ctx, boundSql.sqlStr)
-	if nil != err {
-		return 0, 0, err
-	}
-	defer stmt.Close()
+	result, err := exec.gb.db.ExecContext(ctx, boundSql.sqlStr, paramArr...)
 
-	result, err := stmt.ExecContext(ctx, paramArr...)
 	if nil != err {
 		return 0, 0, err
 	}
 
-	lastInsertId, err = result.LastInsertId()
-	if nil != err {
-		return 0, 0, err
-	}
 	affected, err = result.RowsAffected()
 	if nil != err {
 		return 0, 0, err

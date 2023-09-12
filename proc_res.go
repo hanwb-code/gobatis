@@ -346,15 +346,8 @@ func rowsToStructs(rows *sql.Rows, resultType reflect.Type) ([]interface{}, erro
 	for i := 0; i < fields; i++ {
 		field := resultType.Field(i)
 		fieldsMapper[field.Name] = field.Name
-
-		// 检查是否存在db标签，如果不存在则使用json标签
 		if dbTag := field.Tag.Get("db"); dbTag != "" && dbTag != "-" {
 			fieldsMapper[dbTag] = field.Name
-		} else {
-			jsonTag := field.Tag.Get("json")
-			if jsonTag != "" && jsonTag != "-" {
-				fieldsMapper[jsonTag] = field.Name
-			}
 		}
 	}
 

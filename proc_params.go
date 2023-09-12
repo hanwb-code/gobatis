@@ -140,10 +140,8 @@ func structToMap(s interface{}) map[string]interface{} {
 					res[field.Name] = data
 					// 检查是否存在db标签，如果不存在则使用json标签
 					var paramName string
-					if dbTag := field.Tag.Get("db"); dbTag != "" && dbTag != "-" {
+					if dbTag := field.Tag.Get("json"); dbTag != "" && dbTag != "-" {
 						paramName = dbTag
-					} else {
-						paramName = field.Tag.Get("json")
 					}
 					if paramName != "" {
 						res[paramName] = data

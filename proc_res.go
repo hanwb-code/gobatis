@@ -75,7 +75,9 @@ Tips: "(&res)" --> don't forget "&"
 }
 
 func resStructsProc(rows *sql.Rows, res interface{}) error {
+
 	sliceVal := reflect.ValueOf(res)
+
 	if sliceVal.Kind() != reflect.Ptr {
 		return errors.New("structs query result must be ptr")
 	}

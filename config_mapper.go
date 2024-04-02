@@ -48,19 +48,25 @@ func (this *mapperConfig) getXmlNode(id string) (rootNode *node, resultType stri
 	}
 
 	resultType = ""
-	if rootNode.Name == "select" {
-		resultTypeAttr, ok := rootNode.Attrs["resultType"]
-		if !ok {
-			panic("Tag `<select>` must have resultType attr!")
-		}
 
-		resultType = resultTypeAttr.Value
+	if rootNode.Name == "select" {
+
+		resultTypeAttr, ok := rootNode.Attrs["resultType"]
+
+		if ok {
+			resultType = resultTypeAttr.Value
+		}
 	}
 
 	return
 }
 
-func (this *mapperConfig) getMappedStmt(id string) *mappedStmt {
+func (this *mapperConfig) getMappedStmtPre(sql string, res interface{}) string {
+
+	return sql
+}
+
+func (this *mapperConfig) getMappedStmt(id string, res interface{}) *mappedStmt {
 
 	if nil == this.cache {
 		this.cache = make(map[string]*mappedStmt)
@@ -73,13 +79,13 @@ func (this *mapperConfig) getMappedStmt(id string) *mappedStmt {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
-	stmt := this.buildSqlNode(id)
+	stmt := this.buildSqlNode(id, res)
 	this.cache[id] = stmt
 
 	return stmt
 }
 
-func (this *mapperConfig) buildSqlNode(id string) *mappedStmt {
+func (this *mapperConfig) buildSqlNode(id string, res interface{}) *mappedStmt {
 
 	rootNode, resultType := this.getXmlNode(id)
 
@@ -93,9 +99,17 @@ func (this *mapperConfig) buildSqlNode(id string) *mappedStmt {
 		}
 	}
 
+	var resultTypeModel ResultType
+
+	if resultType != "" {
+		resultTypeModel = ResultType(resultTypeModel)
+	} else {
+		resultTypeModel = GetResultType(res)
+	}
+
 	stmt := &mappedStmt{
 		sqlSource:  ds,
-		resultType: ResultType(resultType),
+		resultType: resultTypeModel,
 	}
 
 	return stmt

@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 type ResultType string
@@ -314,21 +316,27 @@ func (g *gbBase) Close() error {
 //}
 
 func (g *gbBase) SelectV2(stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
-	ms := g.config.mapperConf.getMappedStmt(stmt)
-	if nil == ms {
-		return func(res interface{}) (int64, error) {
-			return 0, errors.New("Mapped statement not found:" + stmt)
-		}
-	}
-	ms.dbType = g.dbType
 
-	params := paramProcess(param)
+	stmt = strings.TrimSpace(stmt)
+
+	if !strings.HasPrefix(stmt, "<select>") {
+		stmt = fmt.Sprintf("<select>%s</select>", stmt)
+	}
 
 	return func(res interface{}) (int64, error) {
+
+		ms := g.config.mapperConf.getMappedStmt(stmt, res)
+
+		ms.dbType = g.dbType
+
+		params := paramProcess(param)
+
 		executor := &executor{
 			gb: g,
 		}
+
 		count, err := executor.query(ms, params, res, rowBound...)
+
 		return count, err
 	}
 }
@@ -340,7 +348,7 @@ func (g *gbBase) Select(stmt string, param interface{}, rowBound ...*rowBounds) 
 	//	stmt = fmt.Sprintf("<select>%s</select>", stmt)
 	//}
 
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 
 	if nil == ms {
 		return func(res interface{}) (int64, error) {
@@ -363,7 +371,7 @@ func (g *gbBase) Select(stmt string, param interface{}, rowBound ...*rowBounds) 
 
 func (g *gbBase) SelectContext(ctx context.Context, stmt string, param interface{}, rowBound ...*rowBounds) func(res interface{}) (int64, error) {
 
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 
 	if nil == ms {
 		return func(res interface{}) (int64, error) {
@@ -385,7 +393,7 @@ func (g *gbBase) SelectContext(ctx context.Context, stmt string, param interface
 
 func (g *gbBase) InsertBatch(stmt string, param interface{}) (int64, int64, error) {
 
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 
 	if nil == ms {
 		return 0, 0, errors.New("Mapped statement not found:" + stmt)
@@ -411,7 +419,7 @@ func (g *gbBase) InsertBatch(stmt string, param interface{}) (int64, int64, erro
 // insert(stmt string, param interface{})
 func (g *gbBase) Insert(stmt string, param interface{}) (int64, int64, error) {
 
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 
 	if nil == ms {
 		return 0, 0, errors.New("Mapped statement not found:" + stmt)
@@ -435,7 +443,7 @@ func (g *gbBase) Insert(stmt string, param interface{}) (int64, int64, error) {
 }
 
 func (g *gbBase) InsertContext(ctx context.Context, stmt string, param interface{}) (int64, int64, error) {
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 	if nil == ms {
 		return 0, 0, errors.New("Mapped statement not found:" + stmt)
 	}
@@ -457,7 +465,7 @@ func (g *gbBase) InsertContext(ctx context.Context, stmt string, param interface
 
 // update(stmt string, param interface{})
 func (g *gbBase) Update(stmt string, param interface{}) (int64, error) {
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 	if nil == ms {
 		return 0, errors.New("Mapped statement not found:" + stmt)
 	}
@@ -478,7 +486,7 @@ func (g *gbBase) Update(stmt string, param interface{}) (int64, error) {
 }
 
 func (g *gbBase) UpdateContext(ctx context.Context, stmt string, param interface{}) (int64, error) {
-	ms := g.config.mapperConf.getMappedStmt(stmt)
+	ms := g.config.mapperConf.getMappedStmt(stmt, nil)
 	if nil == ms {
 		return 0, errors.New("Mapped statement not found:" + stmt)
 	}
